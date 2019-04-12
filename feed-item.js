@@ -60,7 +60,7 @@ export class FeedItem extends ElementBase {
 
 .description {
   padding: 20px;
-  white-space: pre;
+  white-space: nowrap;
   text-overflow: ellipsis;
   font-size: 14px;
   overflow: hidden;
