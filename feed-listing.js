@@ -8,7 +8,7 @@ var wait = function(delay) {
 var getXML = function(url) {
   return new Promise(function(ok, fail) {
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", url);
+    xhr.open("GET", window.location.search == "?useproxy" ? "/proxy?" + url : url);
     xhr.responseType = "document";
     xhr.send();
     xhr.onload = () => ok(xhr.response);

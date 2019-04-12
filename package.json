@@ -1,0 +1,23 @@
+{
+  "name": "radio",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "dependencies": {
+    "express": "^4.16.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node proxy"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thomaswilburn/radio.git"
+  },
+  "keywords": [],
+  "author": "Thomas Wilburn",
+  "bugs": {
+    "url": "https://github.com/thomaswilburn/radio/issues"
+  },
+  "homepage": "https://github.com/thomaswilburn/radio#readme"
+}
