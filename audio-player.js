@@ -69,7 +69,7 @@ class AudioPlayer extends ElementBase {
   
   onAudio() {
     var a = this.audio;
-    this.elements.playButton.innerHTML = a.paused ? "||" : ">";
+    this.elements.playButton.innerHTML = !a.paused ? "||" : ">";
     this.elements.timeDisplay.innerHTML = this.formatTime(a.currentTime);
     this.elements.totalDisplay.innerHTML = this.formatTime(a.duration);
     

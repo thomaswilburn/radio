@@ -6,18 +6,23 @@ class FeedCollection extends ElementBase {
   constructor() {
     super();
     
-    this.feeds = [
+    this.populate();
+    
+    this.elements.addButton.addEventListener("click", this.onClickAdd);
+    this.addEventListener("feed-removed", this.onRemovedFeed);
+  }
+  
+  async populate() {
+    this.feeds = (await storage.get("feeds")) || [
       "https://rss.acast.com/begoodandrewatchit",
-      "https://rss.acast.com/vicegamingsnewpodcast"
+      "https://rss.acast.com/vicegamingsnewpodcast",
+      "https://rss.simplecast.com/podcasts/2269/rss"
     ];
     this.feeds.forEach(url => {
       var listing = document.createElement("feed-listing");
       listing.setAttribute("src", url);
       this.elements.feedContainer.appendChild(listing);
     });
-    
-    this.elements.addButton.addEventListener("click", this.onClickAdd);
-    this.addEventListener("feed-removed", this.onRemovedFeed);
   }
   
   async save() {
@@ -27,6 +32,7 @@ class FeedCollection extends ElementBase {
   onRemovedFeed(e) {
     this.elements.feedContainer.removeChild(e.detail.element);
     this.feeds = this.feeds.filter(f => f != e.detail.url);
+    this.save();
   }
   
   onClickAdd() {

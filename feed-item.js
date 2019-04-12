@@ -40,7 +40,7 @@ export class FeedItem extends ElementBase {
 <style>
 :host {
   display: block;
-  border-top: 1px solid black;
+  border-bottom: 1px solid #888;
   padding: 10px;
 }
 

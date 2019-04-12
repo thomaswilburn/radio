@@ -1,6 +1,7 @@
 var facade = {
   "get": async function(key) {
     var v = localStorage.getItem(key);
+    if (!v) return null;
     return JSON.parse(v);
   },
   

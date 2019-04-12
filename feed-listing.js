@@ -153,15 +153,15 @@ export class FeedListing extends ElementBase {
 
 .updating .unsubscribe,
 .updating .expander {
-  display: none;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .episodes {
-  padding: 0;
-  margin: 0;
+  padding: 0 0 0 4px;
+  margin: 0 0 0 4px;
   display: none;
-  border-left: 4px solid #333;
-  border-right: 4px solid #333;
+  border-left: 4px dotted #333;
 }
 </style>
 <div as="container">
@@ -171,7 +171,7 @@ export class FeedListing extends ElementBase {
       <button class="unsubscribe" as="unsubscribeButton">(unsubscribe?)</button>
     </div>
     <div class="count" as="count"></div>
-    <button class="expander" as="expandButton">⛛</button>
+    <button class="expander" as="expandButton">&#9661;</button>
   </div>
   <ul class="episodes" as="episodeContainer"></ul>
 </div>
