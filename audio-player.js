@@ -86,6 +86,7 @@ class AudioPlayer extends ElementBase {
   display: flex;
   align-items: center;
   font-family: monospace;
+  padding: 8px;
 }
 
 .play {

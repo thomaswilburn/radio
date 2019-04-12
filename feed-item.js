@@ -40,11 +40,37 @@ export class FeedItem extends ElementBase {
 <style>
 :host {
   display: block;
+  border-top: 1px solid black;
+  padding: 10px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+}
+
+.play {
+  border: 1px solid #808;
+  border-radius: 8px;
+  margin: 0 8px;
+  background: transparent;
+  padding: 4px 8px;
+  color: #808;
+}
+
+.description {
+  padding: 20px;
+  white-space: pre;
+  text-overflow: ellipsis;
+  font-size: 14px;
+  overflow: hidden;
 }
 </style>
 <div class="container" role="list-item">
-  <button class="play" as="playButton">play</button>
-  <div class="title" as="title"></div>
+  <div class="row">
+    <button class="play" as="playButton">play</button>
+    <div class="title" as="title"></div>
+  </div>
   <div class="description" as="description"></div>
 </div>
     `;
