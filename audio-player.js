@@ -27,6 +27,12 @@ class AudioPlayer extends ElementBase {
   attributeChangedCallback(attr, old, value) {
     switch (attr) {
       case "src":
+        if (value) {
+          this.elements.playButton.removeAttribute("disabled");
+          this.elements.scrubber.classList.remove("disabled");
+        } else {
+          this.elements.playButton.setAttribute("disabled", "");
+        }
         this.audio.src = value;
         break;
     }
@@ -102,12 +108,18 @@ class AudioPlayer extends ElementBase {
   color: #808;
 }
 
+.play[disabled] {
+  border-color: #CCC;
+  color: #CCC;
+}
+
 .scrubber {
   flex: 1;
   height: 10px;
   background: #CCC;
   position: relative;
   margin: 0 10px;
+  cursor: pointer;
 }
 
 .progress {
@@ -117,6 +129,14 @@ class AudioPlayer extends ElementBase {
   left: 0;
   width: 0%;
   background: #C8C;
+}
+
+.scrubber.disabled {
+  cursor: default;
+}
+
+.scrubber.disabled .progress {
+  opacity: .1;
 }
 
 .progress::after {
@@ -131,8 +151,8 @@ class AudioPlayer extends ElementBase {
 }
 
 </style>
-<button class="play" as="playButton"></button>
-<div class="scrubber" as="scrubber">
+<button disabled class="play" as="playButton"></button>
+<div class="scrubber disabled" as="scrubber">
   <div class="progress" as="progressBar"></div>
 </div>
 <div class="time" as="timeDisplay"></div> / 

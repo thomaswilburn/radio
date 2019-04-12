@@ -6,34 +6,57 @@ class FeedCollection extends ElementBase {
   constructor() {
     super();
     
-    this.feeds = ["https://rss.acast.com/begoodandrewatchit"];
+    this.feeds = [
+      "https://rss.acast.com/begoodandrewatchit",
+      "http://rss.acast.com/vicegamingsnewpodcast"
+    ];
     this.feeds.forEach(url => {
       var listing = document.createElement("feed-listing");
       listing.setAttribute("src", url);
       this.elements.feedContainer.appendChild(listing);
     });
-  }
-  
-  async populate() {
     
+    this.elements.addButton.addEventListener("click", this.onClickAdd);
+    this.addEventListener("feed-removed", this.onRemovedFeed);
   }
   
   async save() {
-    
+    return storage.set("feeds", this.feeds);
+  }
+  
+  onRemovedFeed(e) {
+    this.elements.feedContainer.removeChild(e.detail.element);
+    this.feeds = this.feeds.filter(f => f != e.detail.url);
   }
   
   onClickAdd() {
-    
+    var url = prompt("Feed URL?");
+    this.feeds.push(url);
+    this.save();
+    var listing = document.createElement("feed-listing");
+    listing.setAttribute("src", url);
+    this.elements.feedContainer.appendChild(listing);
   }
   
   static get boundMethods() {
-    return ["onClickAdd"]
+    return ["onClickAdd", "onRemovedFeed"]
   }
   
   static get template() {
     return `
 <style>
-
+.add-feed {
+  border: none;
+  background: transparent;
+  display: block;
+  text-align: center;
+  padding: 8px 20px;
+  font-size: 20px;
+  text-transform: uppercase;
+  font-weight: bold;
+  cursor: pointer;
+  margin: auto;
+}
 </style>
 <div class="feeds" as="feedContainer"></div>
 <button class="add-feed" as="addButton">add feed</button>
