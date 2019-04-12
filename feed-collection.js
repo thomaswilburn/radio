@@ -8,7 +8,7 @@ class FeedCollection extends ElementBase {
     
     this.feeds = [
       "https://rss.acast.com/begoodandrewatchit",
-      "http://rss.acast.com/vicegamingsnewpodcast"
+      "https://rss.acast.com/vicegamingsnewpodcast"
     ];
     this.feeds.forEach(url => {
       var listing = document.createElement("feed-listing");
