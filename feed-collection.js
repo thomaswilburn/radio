@@ -20,7 +20,7 @@ class FeedCollection extends ElementBase {
     ];
     this.feeds.forEach(url => {
       var listing = document.createElement("feed-listing");
-      listing.setAttribute("src", url);
+      listing.src = url;
       this.elements.feedContainer.appendChild(listing);
     });
   }

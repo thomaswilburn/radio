@@ -12,5 +12,11 @@ export default class ElementBase extends HTMLElement {
     if (def.boundMethods) {
       def.boundMethods.forEach(f => this[f] = this[f].bind(this));
     }
+    if (def.mirroredProps) {
+      def.mirroredProps.forEach(p => Object.defineProperty(this, p, {
+        get() { this.getAttribute(p) },
+        set(v) { return this.setAttribute(p, v) }
+      }));
+    }
   }
 }

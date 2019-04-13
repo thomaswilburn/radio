@@ -1,11 +1,5 @@
 import ElementBase from "./element-base.js";
 
-var bound = [
-  "onClickPlay",
-  "onClickScrubber",
-  "onAudio"
-];
-
 class AudioPlayer extends ElementBase {
   constructor() {
     super();
@@ -27,15 +21,23 @@ class AudioPlayer extends ElementBase {
   attributeChangedCallback(attr, old, value) {
     switch (attr) {
       case "src":
-        if (value) {
-          this.elements.playButton.removeAttribute("disabled");
-          this.elements.scrubber.classList.remove("disabled");
-        } else {
-          this.elements.playButton.setAttribute("disabled", "");
-        }
-        this.audio.src = value;
+        this.src = value;
         break;
     }
+  }
+  
+  get src() {
+    return this.audio.src;
+  }
+  
+  set src(value) {
+    if (value) {
+      this.elements.playButton.removeAttribute("disabled");
+      this.elements.scrubber.classList.remove("disabled");
+    } else {
+      this.elements.playButton.setAttribute("disabled", "");
+    }
+    this.audio.src = value;
   }
   
   disconnectedCallback() {

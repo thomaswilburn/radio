@@ -22,5 +22,6 @@ All Web Components here extend a common ``ElementBase`` instead of directly work
 * If the component class has a static getter method for ``template``, this will be splatted into the shadow root for the element. Most templates include a ``<style>`` tag, which gets encapsulated via the shadow DOM (hence much shorter selectors).
 * Any elements in the template with an ``as="prop"`` attribute will be assigned to the element as ``elements.prop``, which makes it easier to refer to them later or bind events immediately.
 * If the component class has a static getter method for ``boundMethods``, those methods will have their context bound to the element. This greatly simplifies event listeners (e.g., ``this.elements.button.addEventListener("click", this.onClicked)``).
+* If the component class has a static getter method for ``mirroredProps``, getters and setters will be created that automatically update the attributes in the DOM to match (it's easiest to handle changes in the ``attributeChangedCallback``).
 
 The use of static getters will be familiar to anyone who has used Web Components, since it's the same way the ``observedAttributes`` list is assigned for an element.

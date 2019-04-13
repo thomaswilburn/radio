@@ -32,7 +32,7 @@ export class FeedListing extends ElementBase {
   }
   
   static get observedAttributes() {
-    return ["src"]
+    return ["src"];
   }
   
   attributeChangedCallback(attr, old, value) {
@@ -41,6 +41,10 @@ export class FeedListing extends ElementBase {
         this.update(value);
         break;
     }
+  }
+  
+  static get mirroredProps() {
+    return ["src"];
   }
   
   async update(url) {
@@ -57,8 +61,6 @@ export class FeedListing extends ElementBase {
     var spinner = window.setInterval(tick, 200);
     try {
       var response = await getXML(url);
-      // await wait(1000);
-      window.clearInterval(spinner);
       this.elements.container.classList.remove("updating");
       this.elements.title.innerHTML = response.querySelector("channel title").textContent;
       var items = Array.from(response.querySelectorAll("item")).slice(0, 100);
@@ -76,12 +78,12 @@ export class FeedListing extends ElementBase {
         this.elements.episodeContainer.appendChild(episode);
       });
     } catch (err) {
-      window.clearInterval(spinner);
       console.log(err);
-      this.updating = false;
       this.elements.title.innerHTML = "Unable to pull feed";
       this.elements.container.classList.remove("updating");
     }
+    window.clearInterval(spinner);
+    this.updating = false;
   }
   
   onClickUnsubscribe() {
