@@ -14,6 +14,14 @@ export class FeedItem extends ElementBase {
     switch (attr) {
       case "title":
       case "description":
+        if (value.length > 200) {
+          var words = value.split(" ");
+          var newValue = words.shift();
+          while (newValue.length < 200) {
+            newValue += " " + words.shift();
+          }
+          value = newValue + "...";
+        }
         this.elements[attr].innerHTML = value;
         break;
     }
@@ -66,8 +74,6 @@ export class FeedItem extends ElementBase {
 
 .description {
   padding: 20px;
-  white-space: nowrap;
-  text-overflow: ellipsis;
   font-size: 14px;
   overflow: hidden;
 }

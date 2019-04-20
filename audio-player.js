@@ -164,11 +164,12 @@ button {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 10px;
+  font-size: 16px;
   background: white;
   color: #808;
   font-weight: bold;
   line-height: 1;
+  margin-right: 10px;
 }
 
 button[disabled] {
@@ -231,8 +232,8 @@ button[disabled] {
 
 </style>
 <button disabled as="playButton"></button>
-<button disabled as="rewind">-10</button>
-<button disabled as="ffwd">+10</button>
+<button disabled as="rewind">-A</button>
+<button disabled as="ffwd">+A</button>
 <div class="scrubber disabled" as="scrubber">
   <div class="track"></div>
   <div class="progress" as="progressBar"></div>
