@@ -25,6 +25,7 @@ export class FeedItem extends ElementBase {
       bubbles: true,
       composed: true,
       detail: {
+        target: this,
         url: this.getAttribute("url")
       }
     });
@@ -56,6 +57,11 @@ export class FeedItem extends ElementBase {
   background: transparent;
   padding: 4px 8px;
   color: #808;
+}
+
+:host([playing]) .play {
+  background: #808;
+  color: white;
 }
 
 .description {

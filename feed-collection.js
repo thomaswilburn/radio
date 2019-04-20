@@ -26,6 +26,7 @@ class FeedCollection extends ElementBase {
   }
   
   async save() {
+    this.feeds = this.feeds.filter(f => f);
     return storage.set("feeds", this.feeds);
   }
   
