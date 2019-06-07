@@ -67,7 +67,8 @@ export class FeedListing extends ElementBase {
     try {
       var response = this.feed = await getXML(url);
       this.elements.container.classList.remove("updating");
-      this.elements.title.innerHTML = response.querySelector("channel title").textContent;
+      this.feedTitle = response.querySelector("channel title").textContent;
+      this.elements.title.innerHTML = this.feedTitle;
       var unseen = 0;
       var lastRequested = new Date((await Storage.get("requested-" + url)) * 1 || 0);
       // parse item elements
@@ -122,7 +123,7 @@ export class FeedListing extends ElementBase {
   }
   
   onClickUnsubscribe() {
-    var confirm = window.confirm(`Unsubscribe from ${this.title}?`);
+    var confirm = window.confirm(`Unsubscribe from ${this.feedTitle}?`);
     if (!confirm) return;
     var url = this.getAttribute("src");
     var e = new CustomEvent("feed-removed", {
