@@ -38,6 +38,7 @@ class FeedCollection extends ElementBase {
   
   onClickAdd() {
     var url = prompt("Feed URL?");
+    if (!url) return;
     this.feeds.push(url);
     this.save();
     var listing = document.createElement("feed-listing");
