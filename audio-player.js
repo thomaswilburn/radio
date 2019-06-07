@@ -129,7 +129,7 @@ class AudioPlayer extends ElementBase {
       this.elements.playButton.innerHTML = "...";
     } else {
       this.setEnabledState(true);
-      this.elements.playButton.innerHTML = !a.paused ? "||" : ">";
+      this.elements.playButton.classList.toggle("paused", a.paused);
     }
     this.elements.timeDisplay.innerHTML = this.formatTime(a.currentTime);
     this.elements.totalDisplay.innerHTML = this.formatTime(a.duration);
@@ -152,8 +152,8 @@ class AudioPlayer extends ElementBase {
 :host {
   display: flex;
   align-items: center;
-  font-family: monospace;
   padding: 8px;
+  font-family: var(--ui-font);
 }
 
 button {
@@ -164,17 +164,38 @@ button {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 16px;
   background: white;
   color: #808;
-  font-weight: bold;
   line-height: 1;
   margin-right: 10px;
+  padding: 0;
 }
 
 button[disabled] {
   border-color: #CCC;
   color: #CCC;
+}
+
+line, path {
+  stroke-width: 2;
+  stroke: currentColor;
+  fill: currentColor;
+}
+
+.play-icon {
+  display: none;
+}
+
+.pause-icon {
+  display: block;
+}
+
+.play.button.paused .play-icon {
+  display: block;
+}
+
+.play.button.paused .pause-icon {
+  display: none;
 }
 
 .scrubber {
@@ -231,7 +252,15 @@ button[disabled] {
 }
 
 </style>
-<button disabled as="playButton"></button>
+<button disabled as="playButton" class="play button paused">
+  <svg class="play-icon" width=16 height=16>
+    <path d="M0,0 L16,8 0,16 Z" />
+  </svg>
+  <svg class="pause-icon" width=16 height=16>
+    <line x1=4 y1=0 x2=4 y2=16 />
+    <line x1=12 y1=0 x2=12 y2=16 />
+  </svg>
+</button>
 <button disabled as="rewind">-A</button>
 <button disabled as="ffwd">+A</button>
 <div class="scrubber disabled" as="scrubber">

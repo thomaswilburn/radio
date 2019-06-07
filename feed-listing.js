@@ -1,5 +1,6 @@
 import "./feed-item.js";
 import ElementBase from "./element-base.js";
+import Storage from "./storage.js";
 
 var wait = function(delay) {
   return new Promise(ok => setTimeout(ok, delay));
@@ -16,19 +17,23 @@ var getXML = function(url) {
   });
 };
 
-var removeCDATA = str => str.replace(/^<!\[CDATA\[|<[^>]+>|\]\]>$/g, "");
+var removeCDATA = str => str.replace(/^<!\[CDATA\[|<[^>]+>|\]\]>$/g, "").trim();
 
 export class FeedListing extends ElementBase {
 
   constructor() {
     super();
     this.updating = false;
+    this.items = [];
+    this.cursor = 0;
+    this.elements.title.addEventListener("click", this.onClickExpand);
     this.elements.expandButton.addEventListener("click", this.onClickExpand);
     this.elements.unsubscribeButton.addEventListener("click", this.onClickUnsubscribe);
+    this.elements.loadMore.addEventListener("click", this.onClickMore);
   }
   
   static get boundMethods() {
-    return ["onClickExpand", "onClickUnsubscribe"];
+    return ["onClickExpand", "onClickUnsubscribe", "onClickMore"];
   }
   
   static get observedAttributes() {
@@ -60,23 +65,37 @@ export class FeedListing extends ElementBase {
     tick();
     var spinner = window.setInterval(tick, 200);
     try {
-      var response = await getXML(url);
+      var response = this.feed = await getXML(url);
       this.elements.container.classList.remove("updating");
       this.elements.title.innerHTML = response.querySelector("channel title").textContent;
-      var items = Array.from(response.querySelectorAll("item")).slice(0, 100);
-      this.elements.count.innerHTML = items.length;
-      this.elements.episodeContainer.innerHTML = "";
-      items.forEach(item => {
-        var title = item.querySelector("title");
-        var description = item.querySelector("description");
+      var unseen = 0;
+      var lastRequested = new Date((await Storage.get("requested-" + url)) * 1 || 0);
+      // parse item elements
+      var items = this.items = Array.from(response.querySelectorAll("item")).map(function(item) {
+        var text = {
+          pubDate: null,
+          title: null,
+          description: null,
+          link: null
+        };
+        for (var k in text) {
+          var element = item.querySelector(k);
+          if (element) text[k] = removeCDATA(element.textContent);
+        }
         var enclosure = item.querySelector("enclosure");
-        if (!enclosure) return;
-        var episode = document.createElement("feed-item");
-        episode.setAttribute("title", title ? title.textContent : "Untitled");
-        episode.setAttribute("description", description ? removeCDATA(description.textContent) : "");
-        episode.setAttribute("url", enclosure.getAttribute("url"));
-        this.elements.episodeContainer.appendChild(episode);
-      });
+        if (!enclosure) return null;
+        enclosure = enclosure.getAttribute("url");
+        var date = text.pubDate ? Date.parse(text.pubDate) : new Date(0);
+        var value = { date, enclosure, ...text };
+        if (date < lastRequested) {
+          value.seen = true;
+        }
+        return value;
+      }).filter(d => d);
+      this.addItems(10);
+      this.lastRequested = new Date((await Storage.get("request-" + url)) * 1 || 0);
+      this.elements.count.innerHTML = `${items.length} (${unseen})`;
+      await Storage.set("request-" + url, (new Date()).valueOf());
     } catch (err) {
       console.log(err);
       this.elements.title.innerHTML = "Unable to pull feed";
@@ -85,8 +104,26 @@ export class FeedListing extends ElementBase {
     window.clearInterval(spinner);
     this.updating = false;
   }
+
+  addItem(item) {
+    var episode = document.createElement("feed-item");
+    episode.setAttribute("title", item.title || "Untitled");
+    episode.setAttribute("description", item.description || "");
+    episode.setAttribute("url", item.enclosure);
+    episode.setAttribute("page", item.link);
+    this.elements.episodeContainer.insertBefore(episode, this.elements.loadMore);
+  }
+
+  addItems(count) {
+    var toAdd = this.items.slice(this.cursor, this.cursor + count);
+    toAdd.forEach(item => this.addItem(item));
+    this.cursor += count;
+    if (this.cursor >= this.items.length) this.elements.loadMore.style.display = "none";
+  }
   
   onClickUnsubscribe() {
+    var confirm = window.confirm(`Unsubscribe from ${this.title}?`);
+    if (!confirm) return;
     var url = this.getAttribute("src");
     var e = new CustomEvent("feed-removed", {
       bubbles: true,
@@ -98,6 +135,10 @@ export class FeedListing extends ElementBase {
   
   onClickExpand() {
     this.elements.container.classList.toggle("expanded");
+  }
+
+  onClickMore() {
+    this.addItems(10);
   }
   
   static get template() {
@@ -113,6 +154,7 @@ export class FeedListing extends ElementBase {
   align-items: center;
   background: #333;
   color: white;
+  font-family: var(--ui-font);
 }
 
 .metadata button {
@@ -165,17 +207,33 @@ export class FeedListing extends ElementBase {
   display: none;
   border-left: 4px dotted #333;
 }
+
+.load-more {
+  width: 100%;
+  display: block;
+  text-transform: uppercase;
+  padding: 24px 0;
+  text-align: center;
+  background: white;
+  cursor: pointer;
+  font-size: 18px;
+  border: none;
+  text-style: italic;
+  font-family: var(--ui-font);
+}
 </style>
 <div as="container">
   <div class="metadata">
     <div class="title">
       <span as="title"></span>    
-      <button class="unsubscribe" as="unsubscribeButton">(unsubscribe?)</button>
+      <button class="unsubscribe" as="unsubscribeButton">remove</button>
     </div>
     <div class="count" as="count"></div>
     <button class="expander" as="expandButton">&#9661;</button>
   </div>
-  <ul class="episodes" as="episodeContainer"></ul>
+  <ul class="episodes" as="episodeContainer">
+    <button class="load-more" as="loadMore">Load more</button>
+  </ul>
 </div>
 `
   }

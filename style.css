@@ -2,6 +2,12 @@
   box-sizing: border-box;
 }
 
+:root {
+  --ui-font: 'Comfortaa', sans-serif;
+  --content-font: 'Open Sans', serif;
+  --title-font: 'Oswald', sans-serif;
+}
+
 body {
   margin: 0;
   display: flex;
@@ -9,6 +15,7 @@ body {
   height: 100vh;
   font-family: sans-serif;
   font-size: 20px;
+  touch-action: manipulation;
 }
 
 h1 {
@@ -18,9 +25,8 @@ h1 {
   background: #808;
   color: white;
   text-transform: uppercase;
-  font-style: italic;
   font-size: 12px;
-  font-family: monospace
+  font-family: var(--ui-font);
 }
 
 feed-collection {

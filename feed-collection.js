@@ -14,7 +14,7 @@ class FeedCollection extends ElementBase {
   
   async populate() {
     this.feeds = (await storage.get("feeds")) || [
-      "https://rss.acast.com/begoodandrewatchit",
+      "https://www.npr.org/rss/podcast.php?id=510312",
       "https://rss.acast.com/vicegamingsnewpodcast",
       "https://rss.simplecast.com/podcasts/2269/rss"
     ];
@@ -63,6 +63,7 @@ class FeedCollection extends ElementBase {
   font-weight: bold;
   cursor: pointer;
   margin: auto;
+  font-family: var(--ui-font);
 }
 </style>
 <div class="feeds" as="feedContainer"></div>
