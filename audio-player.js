@@ -126,10 +126,10 @@ class AudioPlayer extends ElementBase {
     var a = this.audio;
     if (e && e.type == "seeking") {
       this.setEnabledState(false);
-      this.elements.playButton.innerHTML = "...";
+      this.elements.playButton.setAttribute("state", "seeking");
     } else {
       this.setEnabledState(true);
-      this.elements.playButton.classList.toggle("paused", a.paused);
+      this.elements.playButton.setAttribute("state", a.paused ? "paused" : "playing")
     }
     this.elements.timeDisplay.innerHTML = this.formatTime(a.currentTime);
     this.elements.totalDisplay.innerHTML = this.formatTime(a.duration);
@@ -182,20 +182,20 @@ line, path {
   fill: currentColor;
 }
 
-.play-icon {
+.play.button svg {
   display: none;
 }
 
-.pause-icon {
+.play.button[state="playing"] .pause-icon {
   display: block;
 }
 
-.play.button.paused .play-icon {
+.play.button[state="paused"] .play-icon {
   display: block;
 }
 
-.play.button.paused .pause-icon {
-  display: none;
+.play.button[state="seeking"] .seek-icon {
+  display: block;
 }
 
 .scrubber {
@@ -252,13 +252,18 @@ line, path {
 }
 
 </style>
-<button disabled as="playButton" class="play button paused">
+<button disabled as="playButton" class="play button" state="paused">
   <svg class="play-icon" width=16 height=16>
     <path d="M0,0 L16,8 0,16 Z" />
   </svg>
   <svg class="pause-icon" width=16 height=16>
     <line x1=4 y1=0 x2=4 y2=16 />
     <line x1=12 y1=0 x2=12 y2=16 />
+  </svg>
+  <svg class="seek-icon" width=16 height=16>
+    <circle cx=2 cy=8 r=2 />
+    <circle cx=8 cy=8 r=2 />
+    <circle cx=14 cy=8 r=2 />
   </svg>
 </button>
 <button disabled as="rewind">-A</button>
