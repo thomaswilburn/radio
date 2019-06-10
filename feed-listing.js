@@ -90,6 +90,8 @@ export class FeedListing extends ElementBase {
         var value = { date, enclosure, ...text };
         if (date < lastRequested) {
           value.seen = true;
+        } else {
+          unseen++;
         }
         return value;
       }).filter(d => d);
