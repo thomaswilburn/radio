@@ -70,9 +70,9 @@ export class FeedListing extends ElementBase {
       this.feedTitle = response.querySelector("channel title").textContent;
       this.elements.title.innerHTML = this.feedTitle;
       var unseen = 0;
-      var lastRequested = new Date((await Storage.get("requested-" + url)) * 1 || 0);
+      var lastRequested = new Date((await Storage.get("requested-" + url)));
       // parse item elements
-      var items = this.items = Array.from(response.querySelectorAll("item")).map(function(item) {
+      var items = this.items = Array.from(response.querySelectorAll("item")).map(item => {
         var text = {
           pubDate: null,
           title: null,
@@ -86,9 +86,9 @@ export class FeedListing extends ElementBase {
         var enclosure = item.querySelector("enclosure");
         if (!enclosure) return null;
         enclosure = enclosure.getAttribute("url");
-        var date = text.pubDate ? Date.parse(text.pubDate) : new Date(0);
+        var date = new Date(text.pubDate ? Date.parse(text.pubDate) : 0);
         var value = { date, enclosure, ...text };
-        if (date < lastRequested) {
+        if (date <= lastRequested) {
           value.seen = true;
         } else {
           unseen++;
@@ -96,9 +96,9 @@ export class FeedListing extends ElementBase {
         return value;
       }).filter(d => d);
       this.addItems(10);
-      this.lastRequested = new Date((await Storage.get("request-" + url)) * 1 || 0);
+      this.lastRequested = lastRequested;
       this.elements.count.innerHTML = `${items.length} (${unseen})`;
-      await Storage.set("request-" + url, (new Date()).valueOf());
+      await Storage.set("requested-" + url, (new Date()).valueOf());
     } catch (err) {
       console.log(err);
       this.elements.title.innerHTML = "Unable to pull feed";
