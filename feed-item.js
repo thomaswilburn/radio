@@ -22,7 +22,7 @@ export class FeedItem extends ElementBase {
       break;
 
       case "page":
-        this.elements.title.href = value || "";
+        this.elements.title.href = value == "null" ? "" : value;
       break;
     }
   }
