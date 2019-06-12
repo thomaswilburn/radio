@@ -111,7 +111,7 @@ export class FeedListing extends ElementBase {
   addItem(item) {
     var episode = document.createElement("feed-item");
     episode.setAttribute("title", item.title || "Untitled");
-    episode.innerHTML = `<div>${item.description}</div>`;
+    episode.innerHTML = item.description;
     episode.setAttribute("url", item.enclosure);
     if (item.link) episode.setAttribute("page", item.link);
     this.elements.episodeContainer.insertBefore(episode, this.elements.loadMore);
