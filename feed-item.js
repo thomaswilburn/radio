@@ -41,7 +41,8 @@ export class FeedItem extends ElementBase {
   }
 
   onClickExpand() {
-    this.elements.description.classList.toggle("expanded");
+    var expanded = this.elements.description.classList.toggle("expanded");
+    this.elements.expandButton.setAttribute("aria-pressed", expanded);
   }
   
   static get boundMethods() {
@@ -108,19 +109,24 @@ export class FeedItem extends ElementBase {
 
 .expand {
   background: transparent;
-  color: black;
+  color: lightgray;
   border: none;
   font-weight: bold;
   font-size: 24px;
   padding: 20px;
   cursor: pointer;
 }
+
+.expand[aria-pressed="true"] {
+  font-weight: bold;
+  color: black;
+}
 </style>
 <div class="container" role="list-item">
   <div class="row">
     <button class="play" as="playButton">play</button>
     <a class="title" as="title" target="_blank"></a>
-    <button class="expand" as="expandButton">&vellip;</button>
+    <button class="expand" as="expandButton" aria-label="Show description">&vellip;</button>
   </div>
   <div class="description" as="description">
     <slot></slot>
