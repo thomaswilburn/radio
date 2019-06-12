@@ -5,7 +5,7 @@ I built this as an experiment in creating a small web app built almost entirely 
 
 1. The top-level page imports and instantiates an ``<audio-player>`` and a ``<feed-collection>``.
 2. The feed collection in turn loads the subscription URLs from localStorage, and assigns those to ``<feed-listing>`` elements.
-3. The feed listings make XHR requests for the podcast feeds (if ``?useproxy`` is set in the page URL, it'll route through a local Node proxy to get around CORS restrictions), and then creates ``<feed-item>`` elements for each episode.
+3. The feed listings make XHR requests for the podcast feeds (it defaults to using a local CORS proxy unless ``?noproxy`` is set in the page URL, since unfortunately many feeds are not served with the ``Access-Control-Allow-Origin`` header set), and then creates ``<feed-item>`` elements for each episode.
 4. Individual components don't try to directly talk to each other -- they dispatch events instead.
 
    * Clicking on episodes sends an event back up to the document body, where it's intercepted by the ``main.js`` script and used to set the source for the audio player.
