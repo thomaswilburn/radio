@@ -111,9 +111,9 @@ export class FeedListing extends ElementBase {
   addItem(item) {
     var episode = document.createElement("feed-item");
     episode.setAttribute("title", item.title || "Untitled");
-    episode.setAttribute("description", item.description || "");
+    episode.innerHTML = `<div>${item.description}</div>`;
     episode.setAttribute("url", item.enclosure);
-    episode.setAttribute("page", item.link);
+    if (item.link) episode.setAttribute("page", item.link);
     this.elements.episodeContainer.insertBefore(episode, this.elements.loadMore);
   }
 
@@ -167,6 +167,10 @@ export class FeedListing extends ElementBase {
 .metadata .title {
  flex: 1;
  padding: 0 8px;
+ white-space: nowrap;
+ overflow: hidden;
+ min-width: 0;
+ text-overflow: ellipsis;
 }
 
 .metadata .count {

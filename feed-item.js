@@ -41,7 +41,6 @@ export class FeedItem extends ElementBase {
   }
 
   onClickExpand() {
-    this.elements.description.innerHTML = this.getAttribute("description").replace(/\\n/g, "<br><br>");
     this.elements.description.classList.toggle("expanded");
   }
   
@@ -113,7 +112,7 @@ export class FeedItem extends ElementBase {
   border: none;
   font-weight: bold;
   font-size: 24px;
-  padding: 10px;
+  padding: 20px;
   cursor: pointer;
 }
 </style>
@@ -123,7 +122,9 @@ export class FeedItem extends ElementBase {
     <a class="title" as="title" target="_blank"></a>
     <button class="expand" as="expandButton">&vellip;</button>
   </div>
-  <div class="description" as="description"></div>
+  <div class="description" as="description">
+    <slot></slot>
+  </div>
 </div>
     `;
   }
