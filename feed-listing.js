@@ -166,6 +166,7 @@ export class FeedListing extends ElementBase {
 
 .metadata .title {
  flex: 1;
+ flex-basis: 100%;
  padding: 0 8px;
  white-space: nowrap;
  overflow: hidden;
@@ -173,8 +174,14 @@ export class FeedListing extends ElementBase {
  text-overflow: ellipsis;
 }
 
+.metadata .spacer {
+  flex: 1;
+  flex-basis: 0%;
+}
+
 .metadata .count {
   margin: 0 4px;
+  white-space: nowrap;
 }
 
 .expander {
@@ -231,10 +238,9 @@ export class FeedListing extends ElementBase {
 </style>
 <div as="container">
   <div class="metadata">
-    <div class="title">
-      <span as="title"></span>    
-      <button class="unsubscribe" as="unsubscribeButton">remove</button>
-    </div>
+    <div class="title" as="title"></div>
+    <button class="unsubscribe" as="unsubscribeButton">remove</button>
+    <div class="spacer"></div>
     <div class="count" as="count"></div>
     <button class="expander" as="expandButton">&#9661;</button>
   </div>
