@@ -3,8 +3,16 @@ import ElementBase from "./element-base.js";
 export class FeedItem extends ElementBase {
   constructor() {
     super();
+  }
+
+  connectedCallback() {
     this.elements.playButton.addEventListener("click", this.onClickPlay);
     this.elements.expandButton.addEventListener("click", this.onClickExpand);
+  }
+
+  disconnectedCallback() {
+    this.elements.playButton.removeEventListener("click", this.onClickPlay);
+    this.elements.expandButton.removeEventListener("click", this.onClickExpand);
   }
   
   static get observedAttributes() {

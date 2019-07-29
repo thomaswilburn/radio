@@ -30,10 +30,11 @@ export class FeedListing extends ElementBase {
     this.elements.expandButton.addEventListener("click", this.onClickExpand);
     this.elements.unsubscribeButton.addEventListener("click", this.onClickUnsubscribe);
     this.elements.loadMore.addEventListener("click", this.onClickMore);
+    this.elements.refreshButton.addEventListener("click", this.onClickRefresh);
   }
   
   static get boundMethods() {
-    return ["onClickExpand", "onClickUnsubscribe", "onClickMore"];
+    return ["onClickExpand", "onClickUnsubscribe", "onClickMore", "onClickRefresh"];
   }
   
   static get observedAttributes() {
@@ -55,6 +56,9 @@ export class FeedListing extends ElementBase {
   async update(url) {
     if (this.updating) return;
     this.elements.container.classList.add("updating");
+    this.elements.episodeContainer.querySelectorAll("feed-item").forEach(item => item.parentElement.removeChild(item));
+    this.cursor = 0;
+    this.items = [];
     this.updating = true;
     var spins = 0;
     var tick = () => {
@@ -143,6 +147,11 @@ export class FeedListing extends ElementBase {
   onClickMore() {
     this.addItems(10);
   }
+
+  onClickRefresh() {
+    var url = this.getAttribute("src");
+    this.update(url);
+  }
   
   static get template() {
     return `
@@ -153,11 +162,14 @@ export class FeedListing extends ElementBase {
 }
 
 .metadata {
-  display: flex;
-  align-items: center;
   background: #333;
   color: white;
   font-family: var(--ui-font);
+}
+
+.row {
+  display: flex;
+  align-items: center;
 }
 
 .metadata button {
@@ -184,13 +196,24 @@ export class FeedListing extends ElementBase {
   white-space: nowrap;
 }
 
-.expander {
+.expanded-only {
+  display: none;
+  padding: 4px;
+  text-align: right;
+}
+
+.expanded .expanded-only {
+  display: block;
+}
+
+.metadata .expander {
   border: none;
   padding: 10px;
   font-weight: bold;
   background: transparent;
   cursor: pointer;
   transition: transform .2s ease;
+  text-decoration: none;
 }
 
 .expanded .expander {
@@ -201,16 +224,15 @@ export class FeedListing extends ElementBase {
   display: block;
 }
 
-.unsubscribe {
+.metadata button {
   cursor: pointer;
-  text-decoration: underline;
-  border: none;
   background: transparent;
   text-align: right;
+  padding: 4px 8px;
+  border: 1px solid white;
 }
 
-.updating .unsubscribe,
-.updating .expander {
+.updating button {
   opacity: 0;
   pointer-events: none;
 }
@@ -238,11 +260,16 @@ export class FeedListing extends ElementBase {
 </style>
 <div as="container">
   <div class="metadata">
-    <div class="title" as="title"></div>
-    <button class="unsubscribe" as="unsubscribeButton">remove</button>
-    <div class="spacer"></div>
-    <div class="count" as="count"></div>
-    <button class="expander" as="expandButton">&#9661;</button>
+    <div class="always-visible row">
+      <div class="title" as="title"></div>
+      <div class="spacer"></div>
+      <div class="count" as="count"></div>
+      <button class="expander" as="expandButton">&#9661;</button>
+    </div>
+    <div class="expanded-only row">
+      <button class="refresh button" as="refreshButton">refresh</button>
+      <button class="unsubscribe button" as="unsubscribeButton">remove</button>
+    </div>  
   </div>
   <ul class="episodes" as="episodeContainer">
     <button class="load-more" as="loadMore">Load more</button>
