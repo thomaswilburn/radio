@@ -220,6 +220,11 @@ export class FeedListing extends ElementBase {
   transform: rotate(180deg);
 }
 
+.expanded .metadata {
+  position: sticky;
+  top: 0;
+}
+
 .expanded .episodes {
   display: block;
 }
