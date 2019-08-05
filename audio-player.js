@@ -157,8 +157,8 @@ class AudioPlayer extends ElementBase {
 }
 
 button {
-  width: 60px;
-  height: 60px;
+  width: 48px;
+  height: 48px;
   border-radius: 100%;
   border: 3px solid #808;
   display: flex;
@@ -169,6 +169,7 @@ button {
   line-height: 1;
   margin-right: 10px;
   padding: 0;
+  font-size: 20px;
 }
 
 button[disabled] {
@@ -184,6 +185,8 @@ line, path {
 
 .play.button svg {
   display: none;
+  width: 20px;
+  height: 20px;
 }
 
 .play.button[state="playing"] .pause-icon {
@@ -262,14 +265,14 @@ line, path {
   <div class="progress" as="progressBar"></div>
 </div>
 <button disabled as="playButton" class="play button" state="paused">
-  <svg class="play-icon" width=16 height=16>
+  <svg class="play-icon" width=16 height=16 viewBox="0 0 16 16" preserveAspectRatio="none">
     <path d="M0,0 L16,8 0,16 Z" />
   </svg>
-  <svg class="pause-icon" width=16 height=16>
+  <svg class="pause-icon" width=16 height=16 viewBox="0 0 16 16" preserveAspectRatio="none">
     <line x1=4 y1=0 x2=4 y2=16 />
     <line x1=12 y1=0 x2=12 y2=16 />
   </svg>
-  <svg class="seek-icon" width=16 height=16>
+  <svg class="seek-icon" width=16 height=16 viewBox="0 0 16 16" preserveAspectRatio="none">
     <circle cx=2 cy=8 r=2 />
     <circle cx=8 cy=8 r=2 />
     <circle cx=14 cy=8 r=2 />

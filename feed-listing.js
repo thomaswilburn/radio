@@ -205,6 +205,7 @@ export class FeedListing extends ElementBase {
 
 .expanded .expanded-only {
   display: flex;
+  padding: 16px;
 }
 
 .metadata .expander {
@@ -219,7 +220,7 @@ export class FeedListing extends ElementBase {
 }
 
 .expanded .expander {
-  transform: rotate(180deg);
+  transform: rotateX(180deg);
 }
 
 .expanded .metadata {
