@@ -179,11 +179,12 @@ export class FeedListing extends ElementBase {
 .metadata .title {
  flex: 1;
  flex-basis: 100%;
- padding: 0 8px;
+ padding: 8px;
  white-space: nowrap;
  overflow: hidden;
  min-width: 0;
  text-overflow: ellipsis;
+ font-size: 24px;
 }
 
 .metadata .spacer {
@@ -199,16 +200,17 @@ export class FeedListing extends ElementBase {
 .expanded-only {
   display: none;
   padding: 4px;
-  text-align: right;
+  justify-content: space-between;
 }
 
 .expanded .expanded-only {
-  display: block;
+  display: flex;
 }
 
 .metadata .expander {
   border: none;
-  padding: 10px;
+  padding: 4px;
+  font-size: 32px;
   font-weight: bold;
   background: transparent;
   cursor: pointer;
@@ -272,8 +274,8 @@ export class FeedListing extends ElementBase {
       <button class="expander" as="expandButton">&#9661;</button>
     </div>
     <div class="expanded-only row">
-      <button class="refresh button" as="refreshButton">refresh</button>
       <button class="unsubscribe button" as="unsubscribeButton">remove</button>
+      <button class="refresh button" as="refreshButton">refresh</button>
     </div>  
   </div>
   <ul class="episodes" as="episodeContainer">

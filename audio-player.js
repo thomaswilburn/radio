@@ -157,8 +157,8 @@ class AudioPlayer extends ElementBase {
 }
 
 button {
-  width: 40px;
-  height: 40px;
+  width: 60px;
+  height: 60px;
   border-radius: 100%;
   border: 3px solid #808;
   display: flex;
@@ -252,6 +252,15 @@ line, path {
 }
 
 </style>
+
+<div class="timecodes">
+  <div class="time" as="timeDisplay"></div>
+  <div class="time" as="totalDisplay"></div>
+</div>
+<div class="scrubber disabled" as="scrubber">
+  <div class="track"></div>
+  <div class="progress" as="progressBar"></div>
+</div>
 <button disabled as="playButton" class="play button" state="paused">
   <svg class="play-icon" width=16 height=16>
     <path d="M0,0 L16,8 0,16 Z" />
@@ -268,14 +277,6 @@ line, path {
 </button>
 <button disabled as="rewind">-A</button>
 <button disabled as="ffwd">+A</button>
-<div class="scrubber disabled" as="scrubber">
-  <div class="track"></div>
-  <div class="progress" as="progressBar"></div>
-</div>
-<div class="timecodes">
-  <div class="time" as="timeDisplay"></div>
-  <div class="time" as="totalDisplay"></div>
-</div>
 `
   }
 }
