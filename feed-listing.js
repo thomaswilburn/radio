@@ -31,10 +31,11 @@ export class FeedListing extends ElementBase {
     this.elements.unsubscribeButton.addEventListener("click", this.onClickUnsubscribe);
     this.elements.loadMore.addEventListener("click", this.onClickMore);
     this.elements.refreshButton.addEventListener("click", this.onClickRefresh);
+    this.elements.searchButton.addEventListener("click", this.onClickSearch);
   }
   
   static get boundMethods() {
-    return ["onClickExpand", "onClickUnsubscribe", "onClickMore", "onClickRefresh"];
+    return ["onClickExpand", "onClickUnsubscribe", "onClickMore", "onClickRefresh", "onClickSearch"];
   }
   
   static get observedAttributes() {
@@ -52,12 +53,16 @@ export class FeedListing extends ElementBase {
   static get mirroredProps() {
     return ["src"];
   }
+
+  clearItems() {
+    this.cursor = 0;
+    this.elements.episodeContainer.querySelectorAll("feed-item").forEach(item => item.parentElement.removeChild(item)); 
+  }
   
   async update(url) {
     if (this.updating) return;
     this.elements.container.classList.add("updating");
-    this.elements.episodeContainer.querySelectorAll("feed-item").forEach(item => item.parentElement.removeChild(item));
-    this.cursor = 0;
+    this.clearItems();
     this.items = [];
     this.updating = true;
     var spins = 0;
@@ -151,6 +156,22 @@ export class FeedListing extends ElementBase {
   onClickRefresh() {
     var url = this.getAttribute("src");
     this.update(url);
+  }
+
+  onClickSearch() {
+    if (!this.items) return;
+    var search = prompt("Query?");
+    if (!search) {
+      this.elements.searchButton.innerHTML = "search";
+      this.clearItems();
+      this.addItems(10);
+      return;
+    }
+    this.elements.searchButton.innerHTML = "search: " + search;
+    var re = new RegExp(search, "gi");
+    var results = this.items.filter(item => item.title.match(re) || item.description.match(re));
+    this.clearItems();
+    results.forEach(item => this.addItem(item));
   }
   
   static get template() {
@@ -276,6 +297,7 @@ export class FeedListing extends ElementBase {
     </div>
     <div class="expanded-only row">
       <button class="unsubscribe button" as="unsubscribeButton">remove</button>
+      <button class="search button" as="searchButton">search</button>
       <button class="refresh button" as="refreshButton">refresh</button>
     </div>  
   </div>
