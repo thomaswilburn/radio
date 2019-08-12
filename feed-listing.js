@@ -162,11 +162,13 @@ export class FeedListing extends ElementBase {
     if (!this.items) return;
     var search = prompt("Query?");
     if (!search) {
+      this.elements.container.classList.remove("searching");
       this.elements.searchButton.innerHTML = "search";
       this.clearItems();
       this.addItems(10);
       return;
     }
+    this.elements.container.classList.add("searching");
     this.elements.searchButton.innerHTML = "search: " + search;
     var re = new RegExp(search, "gi");
     var results = this.items.filter(item => item.title.match(re) || item.description.match(re));
@@ -286,6 +288,11 @@ export class FeedListing extends ElementBase {
   text-style: italic;
   font-family: var(--ui-font);
 }
+
+.searching .load-more {
+  display: none;
+}
+
 </style>
 <div as="container">
   <div class="metadata">
