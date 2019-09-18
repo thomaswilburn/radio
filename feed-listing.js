@@ -32,10 +32,11 @@ export class FeedListing extends ElementBase {
     this.elements.loadMore.addEventListener("click", this.onClickMore);
     this.elements.refreshButton.addEventListener("click", this.onClickRefresh);
     this.elements.searchButton.addEventListener("click", this.onClickSearch);
+    this.addEventListener("play-item", this.onPlayed);
   }
   
   static get boundMethods() {
-    return ["onClickExpand", "onClickUnsubscribe", "onClickMore", "onClickRefresh", "onClickSearch"];
+    return ["onClickExpand", "onClickUnsubscribe", "onClickMore", "onClickRefresh", "onClickSearch", "onPlayed"];
   }
   
   static get observedAttributes() {
@@ -79,7 +80,7 @@ export class FeedListing extends ElementBase {
       this.feedTitle = response.querySelector("channel title").textContent;
       this.elements.title.innerHTML = this.feedTitle;
       var unseen = 0;
-      var lastRequested = new Date((await Storage.get("requested-" + url)));
+      var lastPlayed = new Date((await Storage.get("played-" + url)));
       // parse item elements
       var items = this.items = Array.from(response.querySelectorAll("item")).map(item => {
         var text = {
@@ -97,7 +98,7 @@ export class FeedListing extends ElementBase {
         enclosure = enclosure.getAttribute("url");
         var date = new Date(text.pubDate ? Date.parse(text.pubDate) : 0);
         var value = { date, enclosure, ...text };
-        if (date <= lastRequested) {
+        if (date <= lastPlayed) {
           value.seen = true;
         } else {
           unseen++;
@@ -105,7 +106,7 @@ export class FeedListing extends ElementBase {
         return value;
       }).filter(d => d);
       this.addItems(10);
-      this.lastRequested = lastRequested;
+      this.lastPlayed = lastPlayed;
       this.elements.count.innerHTML = `${items.length} (${unseen})`;
       await Storage.set("requested-" + url, (new Date()).valueOf());
     } catch (err) {
@@ -174,6 +175,10 @@ export class FeedListing extends ElementBase {
     var results = this.items.filter(item => item.title.match(re) || item.description.match(re));
     this.clearItems();
     results.forEach(item => this.addItem(item));
+  }
+
+  onPlayed() {
+    Storage.set(`played-${this.getAttribute("src")}`, (new Date()).valueOf());
   }
   
   static get template() {
