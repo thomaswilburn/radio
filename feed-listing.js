@@ -32,11 +32,19 @@ export class FeedListing extends ElementBase {
     this.elements.loadMore.addEventListener("click", this.onClickMore);
     this.elements.refreshButton.addEventListener("click", this.onClickRefresh);
     this.elements.searchButton.addEventListener("click", this.onClickSearch);
-    this.addEventListener("play-item", this.onPlayed);
+    this.elements.markReadButton.addEventListener("click", this.updatePlayed);
+    this.addEventListener("play-item", this.updatePlayed);
   }
   
   static get boundMethods() {
-    return ["onClickExpand", "onClickUnsubscribe", "onClickMore", "onClickRefresh", "onClickSearch", "onPlayed"];
+    return [
+      "onClickExpand", 
+      "onClickUnsubscribe", 
+      "onClickMore", 
+      "onClickRefresh", 
+      "onClickSearch",
+      "updatePlayed"
+    ];
   }
   
   static get observedAttributes() {
@@ -177,7 +185,8 @@ export class FeedListing extends ElementBase {
     results.forEach(item => this.addItem(item));
   }
 
-  onPlayed() {
+  updatePlayed() {
+    this.elements.count.innerHTML = `${this.items.length} (0)`;
     Storage.set(`played-${this.getAttribute("src")}`, (new Date()).valueOf());
   }
   
@@ -311,6 +320,7 @@ export class FeedListing extends ElementBase {
       <button class="unsubscribe button" as="unsubscribeButton">remove</button>
       <button class="search button" as="searchButton">search</button>
       <button class="refresh button" as="refreshButton">refresh</button>
+      <button class="mark-read button" as="markReadButton">mark read</button>
     </div>  
   </div>
   <ul class="episodes" as="episodeContainer">
