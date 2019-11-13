@@ -13,3 +13,7 @@ document.body.addEventListener("play-item", function(e) {
   player.src = e.detail.url;
   player.play();
 });
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("./service-worker.js").then(registration => console.log(registration));
+}
