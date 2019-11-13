@@ -8,9 +8,14 @@
       "sizes": "128x128",
       "type": "image/png"
     },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
   ],
   "start_url": "index.html",
-  "display": "fullscreen",
+  "display": "standalone",
   "theme_color": "#808",
   "background_color": "white"
 }
