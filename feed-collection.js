@@ -45,6 +45,11 @@ class FeedCollection extends ElementBase {
     listing.setAttribute("src", url);
     this.elements.feedContainer.appendChild(listing);
   }
+
+  refresh() {
+    var listings = this.shadowRoot.querySelectorAll("feed-listing");
+    listings.forEach(l => l.onClickRefresh());
+  }
   
   static get boundMethods() {
     return ["onClickAdd", "onRemovedFeed"]
