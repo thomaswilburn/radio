@@ -3,11 +3,6 @@ import ElementBase from "./element-base.js";
 import storage from "./storage.js";
 
 class FeedCollection extends ElementBase {
-
-  static get boundMethods() {
-    return ["onClickAdd", "onRemovedFeed"]
-  }
-
   constructor() {
     super();
     
@@ -54,6 +49,10 @@ class FeedCollection extends ElementBase {
   refresh() {
     var listings = this.shadowRoot.querySelectorAll("feed-listing");
     listings.forEach(l => l.onClickRefresh());
+  }
+  
+  static get boundMethods() {
+    return ["onClickAdd", "onRemovedFeed"]
   }
   
   static get template() {

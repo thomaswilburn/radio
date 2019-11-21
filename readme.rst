@@ -19,8 +19,7 @@ Element design
 All Web Components here extend a common ``ElementBase`` instead of directly working from HTMLElement, which is just a way to codify some of the standard constructor code.
 
 * On construction, the element creates an open shadow root immediately. This isn't necessarily better from an inspection standpoint, but it's something we can do in the constructor instead of in ``connectedCallback``, which simplifies the lifecycle.
-* If the component class has a static getter method for ``template``, this will be splatted into the shadow root for the element.
-* If the component has a static getter method for ``stylesheet``, this will be added as a link tag to the shadow root when the element is added to the DOM. Be sure to call ``super.connectedCallback()`` in your element's ``connectedCallback`` method for this to happen.
+* If the component class has a static getter method for ``template``, this will be splatted into the shadow root for the element. Most templates include a ``<style>`` tag, which gets encapsulated via the shadow DOM (hence much shorter selectors).
 * Any elements in the template with an ``as="prop"`` attribute will be assigned to the element as ``elements.prop``, which makes it easier to refer to them later or bind events immediately.
 * If the component class has a static getter method for ``boundMethods``, those methods will have their context bound to the element. This greatly simplifies event listeners (e.g., ``this.elements.button.addEventListener("click", this.onClicked)``).
 * If the component class has a static getter method for ``mirroredProps``, getters and setters will be created that automatically update the attributes in the DOM to match (it's easiest to handle changes in the ``attributeChangedCallback``).
