@@ -21,21 +21,6 @@ var removeCDATA = str => str.replace(/^<!\[CDATA\[|<[^>]+>|\]\]>$/g, "").trim();
 
 export class FeedListing extends ElementBase {
 
-  constructor() {
-    super();
-    this.updating = false;
-    this.items = [];
-    this.cursor = 0;
-    this.elements.title.addEventListener("click", this.onClickExpand);
-    this.elements.expandButton.addEventListener("click", this.onClickExpand);
-    this.elements.unsubscribeButton.addEventListener("click", this.onClickUnsubscribe);
-    this.elements.loadMore.addEventListener("click", this.onClickMore);
-    this.elements.refreshButton.addEventListener("click", this.onClickRefresh);
-    this.elements.searchButton.addEventListener("click", this.onClickSearch);
-    this.elements.markReadButton.addEventListener("click", this.updatePlayed);
-    this.addEventListener("play-item", this.updatePlayed);
-  }
-  
   static get boundMethods() {
     return [
       "onClickExpand", 
@@ -51,16 +36,31 @@ export class FeedListing extends ElementBase {
     return ["src"];
   }
   
+  static get mirroredProps() {
+    return ["src"];
+  }
+
+  constructor() {
+    super();
+    this.updating = false;
+    this.items = [];
+    this.cursor = 0;
+    this.elements.title.addEventListener("click", this.onClickExpand);
+    this.elements.expandButton.addEventListener("click", this.onClickExpand);
+    this.elements.unsubscribeButton.addEventListener("click", this.onClickUnsubscribe);
+    this.elements.loadMore.addEventListener("click", this.onClickMore);
+    this.elements.refreshButton.addEventListener("click", this.onClickRefresh);
+    this.elements.searchButton.addEventListener("click", this.onClickSearch);
+    this.elements.markReadButton.addEventListener("click", this.updatePlayed);
+    this.addEventListener("play-item", this.updatePlayed);
+  }
+  
   attributeChangedCallback(attr, old, value) {
     switch (attr) {
       case "src":
         this.update(value);
         break;
     }
-  }
-  
-  static get mirroredProps() {
-    return ["src"];
   }
 
   clearItems() {
@@ -189,125 +189,13 @@ export class FeedListing extends ElementBase {
     this.elements.count.innerHTML = `${this.items.length} (0)`;
     Storage.set(`played-${this.getAttribute("src")}`, (new Date()).valueOf());
   }
+
+  static get stylesheet() {
+    return "feed-listing.css";
+  }
   
   static get template() {
     return `
-<style>
-:host {
-  display: block;
-  border-bottom: 1px solid #CCC;
-}
-
-.metadata {
-  background: #333;
-  color: white;
-  font-family: var(--ui-font);
-}
-
-.row {
-  display: flex;
-  align-items: center;
-}
-
-.metadata button {
-  color: inherit;
-}
-
-.metadata .title {
- flex: 1;
- flex-basis: 100%;
- padding: 8px;
- white-space: nowrap;
- overflow: hidden;
- min-width: 0;
- text-overflow: ellipsis;
- font-size: 24px;
-}
-
-.metadata .spacer {
-  flex: 1;
-  flex-basis: 0%;
-}
-
-.metadata .count {
-  margin: 0 4px;
-  white-space: nowrap;
-}
-
-.expanded-only {
-  display: none;
-  padding: 4px;
-  justify-content: space-between;
-}
-
-.expanded .expanded-only {
-  display: flex;
-  padding: 16px;
-}
-
-.metadata .expander {
-  border: none;
-  padding: 4px;
-  font-size: 32px;
-  font-weight: bold;
-  background: transparent;
-  cursor: pointer;
-  transition: transform .2s ease;
-  text-decoration: none;
-}
-
-.expanded .expander {
-  transform: rotateX(180deg);
-}
-
-.expanded .metadata {
-  position: sticky;
-  top: 0;
-}
-
-.expanded .episodes {
-  display: block;
-}
-
-.metadata button {
-  cursor: pointer;
-  background: transparent;
-  text-align: right;
-  padding: 4px 8px;
-  border: 1px solid white;
-}
-
-.updating button {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.episodes {
-  padding: 0 0 0 4px;
-  margin: 0 0 0 4px;
-  display: none;
-  border-left: 4px dotted #333;
-}
-
-.load-more {
-  width: 100%;
-  display: block;
-  text-transform: uppercase;
-  padding: 24px 0;
-  text-align: center;
-  background: white;
-  cursor: pointer;
-  font-size: 18px;
-  border: none;
-  text-style: italic;
-  font-family: var(--ui-font);
-}
-
-.searching .load-more {
-  display: none;
-}
-
-</style>
 <div as="container">
   <div class="metadata">
     <div class="always-visible row">

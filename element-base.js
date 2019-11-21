@@ -4,6 +4,12 @@ export default class ElementBase extends HTMLElement {
     this.attachShadow({ mode: "open" });
     var def = new.target;
     if (def.template) this.shadowRoot.innerHTML = def.template;
+    if (def.stylesheet) {
+      var link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = def.stylesheet;
+      this.stylesheet = link;
+    }
     this.elements = {};
     this.shadowRoot.querySelectorAll("[as]").forEach(element => {
       var prop = element.getAttribute("as");
@@ -18,5 +24,18 @@ export default class ElementBase extends HTMLElement {
         set(v) { return this.setAttribute(p, v) }
       }));
     }
+  }
+
+  // call with super.connectedCallback()
+  connectedCallback() {
+    if (this.stylesheet) this.shadowRoot.appendChild(this.stylesheet);
+  }
+
+  disconnectedCallback() {
+
+  }
+
+  attributeChangedCallback() {
+    
   }
 }

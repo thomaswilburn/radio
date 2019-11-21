@@ -1,22 +1,6 @@
 import ElementBase from "./element-base.js";
 
 class AudioPlayer extends ElementBase {
-  constructor() {
-    super();
-    this.audio = document.createElement("audio");
-    this.audio.addEventListener("timeupdate", this.onAudio);
-    this.audio.addEventListener("seeking", this.onAudio);
-    this.elements.playButton.addEventListener("click", this.onClickPlay);
-    this.elements.ffwd.addEventListener("click", this.onFFwd);
-    this.elements.rewind.addEventListener("click", this.onRewind);
-    this.elements.scrubber.addEventListener("click", this.onClickScrubber);
-    this.elements.scrubber.addEventListener("mousedown", this.onTouchScrubber);
-    this.elements.scrubber.addEventListener("touchstart", this.onTouchScrubber);
-    this.elements.scrubber.addEventListener("touchmove", this.onDragScrubber);
-    this.elements.scrubber.addEventListener("touchend", this.onReleaseScrubber);
-    this.onAudio();
-    this.setEnabledState(false);
-  }
   
   static get boundMethods() {
     return [
@@ -33,6 +17,23 @@ class AudioPlayer extends ElementBase {
   
   static get observedAttributes() {
     return ["src"]
+  }
+  
+  constructor() {
+    super();
+    this.audio = document.createElement("audio");
+    this.audio.addEventListener("timeupdate", this.onAudio);
+    this.audio.addEventListener("seeking", this.onAudio);
+    this.elements.playButton.addEventListener("click", this.onClickPlay);
+    this.elements.ffwd.addEventListener("click", this.onFFwd);
+    this.elements.rewind.addEventListener("click", this.onRewind);
+    this.elements.scrubber.addEventListener("click", this.onClickScrubber);
+    this.elements.scrubber.addEventListener("mousedown", this.onTouchScrubber);
+    this.elements.scrubber.addEventListener("touchstart", this.onTouchScrubber);
+    this.elements.scrubber.addEventListener("touchmove", this.onDragScrubber);
+    this.elements.scrubber.addEventListener("touchend", this.onReleaseScrubber);
+    this.onAudio();
+    this.setEnabledState(false);
   }
   
   attributeChangedCallback(attr, old, value) {
@@ -145,117 +146,13 @@ class AudioPlayer extends ElementBase {
   pause() {
     return this.audio.pause();
   }
+
+  static get stylesheet() {
+    return "audio-player.css";
+  }
   
   static get template() {
     return `
-<style>
-:host {
-  display: flex;
-  align-items: center;
-  padding: 8px;
-  font-family: var(--ui-font);
-}
-
-button {
-  width: 48px;
-  height: 48px;
-  border-radius: 100%;
-  border: 3px solid #808;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: white;
-  color: #808;
-  line-height: 1;
-  margin-right: 10px;
-  padding: 0;
-  font-size: 20px;
-}
-
-button[disabled] {
-  border-color: #CCC;
-  color: #CCC;
-}
-
-line, path {
-  stroke-width: 2;
-  stroke: currentColor;
-  fill: currentColor;
-}
-
-.play.button svg {
-  display: none;
-  width: 20px;
-  height: 20px;
-}
-
-.play.button[state="playing"] .pause-icon {
-  display: block;
-}
-
-.play.button[state="paused"] .play-icon {
-  display: block;
-}
-
-.play.button[state="seeking"] .seek-icon {
-  display: block;
-}
-
-.scrubber {
-  flex: 1;
-  position: relative;
-  align-items: center;
-  display: flex;
-  align-self: stretch;
-  margin: 0 10px;
-  cursor: pointer;
-}
-
-.scrubber .track {
-  flex: 1;
-  height: 10px;
-  background: #CCC;
-  pointer-events: none;
-}
-
-.progress {
-  position: absolute;
-  top: 50%;
-  height: 16px;
-  transform: translateY(-50%);
-  bottom: 0;
-  left: 0;
-  width: 0%;
-  background: #C8C;
-  pointer-events: none;
-}
-
-.scrubber.disabled {
-  cursor: default;
-}
-
-.scrubber.disabled .progress {
-  opacity: .1;
-}
-
-.progress::after {
-  position: absolute;
-  top: -2px;
-  right: -5px;
-  width: 10px;
-  height: calc(100% + 4px);
-  display: block;
-  content: "";
-  background: #808;
-}
-
-@media (min-width: 500px) {
-  .timecodes div { display: inline }
-  .timecodes .time[as="totalDisplay"]::before { content: "/ " }
-}
-
-</style>
-
 <div class="timecodes">
   <div class="time" as="timeDisplay"></div>
   <div class="time" as="totalDisplay"></div>
