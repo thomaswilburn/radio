@@ -71,7 +71,16 @@ class FeedCollection extends ElementBase {
   margin: auto;
   font-family: var(--ui-font);
 }
+
+.sr-only {
+  position: absolute;
+  left: -1000px;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
 </style>
+<h2 class="sr-only">Feeds</h2>
 <div class="feeds" as="feedContainer"></div>
 <button class="add-feed" as="addButton">add feed</button>
 `

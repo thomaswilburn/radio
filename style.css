@@ -18,6 +18,12 @@ body {
   touch-action: manipulation;
 }
 
+.sr-only {
+  position: absolute;
+  left: -1000px;
+  opacity: 0;
+}
+
 .top-bar {
   margin: 0;
   text-align: right;

@@ -1,4 +1,5 @@
 import ElementBase from "./element-base.js";
+import events from "./events.js";
 
 class AudioPlayer extends ElementBase {
   constructor() {
@@ -32,7 +33,7 @@ class AudioPlayer extends ElementBase {
   }
   
   static get observedAttributes() {
-    return ["src"]
+    return ["src", "title"]
   }
   
   attributeChangedCallback(attr, old, value) {
@@ -50,6 +51,14 @@ class AudioPlayer extends ElementBase {
   set src(value) {
     this.setEnabledState(!!value);
     this.audio.src = value;
+  }
+
+  get title() {
+    return this.elements.title.innerHTML;
+  }
+
+  set title(value) {
+    this.elements.title.innerHTML = value.trim();
   }
   
   disconnectedCallback() {
@@ -129,16 +138,20 @@ class AudioPlayer extends ElementBase {
       this.elements.playButton.setAttribute("state", "seeking");
     } else {
       this.setEnabledState(true);
+      this.elements.playButton.setAttribute("aria-pressed", !a.paused);
       this.elements.playButton.setAttribute("state", a.paused ? "paused" : "playing")
     }
     this.elements.timeDisplay.innerHTML = this.formatTime(a.currentTime);
     this.elements.totalDisplay.innerHTML = this.formatTime(a.duration);
+
+    events.fire("playing", { url: this.src });
     
     var ratio = a.currentTime / a.duration * 100;
     this.elements.progressBar.style.width = `${ratio | 0}%`;
   }
   
   play() {
+    this.elements.playButton.focus();
     return this.audio.play();
   }
   
@@ -154,6 +167,27 @@ class AudioPlayer extends ElementBase {
   align-items: center;
   padding: 8px;
   font-family: var(--ui-font);
+  flex-wrap: wrap;
+}
+
+.sr-only {
+  position: absolute;
+  left: -1000px;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+h3.title {
+  flex: 0 0 100%;
+  font-size: 16px;
+  font-family: var(--title-font);
+  font-weight: normal;
+  margin: 0;
+  padding: 4px 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 button {
@@ -256,6 +290,10 @@ line, path {
 
 </style>
 
+<h2 class="sr-only">Audio player</h2>
+
+<h3 class="title" as="title"></h3>
+
 <div class="timecodes">
   <div class="time" as="timeDisplay"></div>
   <div class="time" as="totalDisplay"></div>
@@ -264,22 +302,22 @@ line, path {
   <div class="track"></div>
   <div class="progress" as="progressBar"></div>
 </div>
-<button disabled as="playButton" class="play button" state="paused">
-  <svg class="play-icon" width=16 height=16 viewBox="0 0 16 16" preserveAspectRatio="none">
+<button disabled as="playButton" class="play button" state="paused" aria-label="play">
+  <svg class="play-icon" width=16 height=16 viewBox="0 0 16 16" preserveAspectRatio="none" aria-hidden="true">
     <path d="M0,0 L16,8 0,16 Z" />
   </svg>
-  <svg class="pause-icon" width=16 height=16 viewBox="0 0 16 16" preserveAspectRatio="none">
+  <svg class="pause-icon" width=16 height=16 viewBox="0 0 16 16" preserveAspectRatio="none" aria-hidden="true">
     <line x1=4 y1=0 x2=4 y2=16 />
     <line x1=12 y1=0 x2=12 y2=16 />
   </svg>
-  <svg class="seek-icon" width=16 height=16 viewBox="0 0 16 16" preserveAspectRatio="none">
+  <svg class="seek-icon" width=16 height=16 viewBox="0 0 16 16" preserveAspectRatio="none" aria-hidden="true">
     <circle cx=2 cy=8 r=2 />
     <circle cx=8 cy=8 r=2 />
     <circle cx=14 cy=8 r=2 />
   </svg>
 </button>
-<button disabled as="rewind">-A</button>
-<button disabled as="ffwd">+A</button>
+<button disabled as="rewind" aria-label="Back 10 seconds">-A</button>
+<button disabled as="ffwd" aria-label="Skip 10 seconds">+A</button>
 `
   }
 }

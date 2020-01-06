@@ -1,8 +1,18 @@
 import ElementBase from "./element-base.js";
+import events from "./events.js";
 
 export class FeedItem extends ElementBase {
   constructor() {
     super();
+
+    events.on("playing", e => {
+      var matched = e.url == this.getAttribute("url");
+      if (matched) {
+        this.setAttribute("playing", "");
+      } else {
+        this.removeAttribute("playing");
+      }
+    });
   }
 
   connectedCallback() {
@@ -36,16 +46,11 @@ export class FeedItem extends ElementBase {
   }
   
   onClickPlay() {
-    // send a play event up with the URL
-    var e = new CustomEvent("play-item", {
-      bubbles: true,
-      composed: true,
-      detail: {
-        target: this,
-        url: this.getAttribute("url")
-      }
+    // notify the collection that playback has started
+    this.dispatch("play-item", {
+      title: this.getAttribute("title"),
+      url: this.getAttribute("url")
     });
-    this.dispatchEvent(e);
   }
 
   onClickExpand() {

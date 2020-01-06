@@ -129,6 +129,7 @@ export class FeedListing extends ElementBase {
   addItem(item) {
     var episode = document.createElement("feed-item");
     episode.setAttribute("title", item.title || "Untitled");
+    episode.setAttribute("feed-title", this.feedTitle);
     episode.innerHTML = item.description;
     episode.setAttribute("url", item.enclosure);
     if (item.link) episode.setAttribute("page", item.link);
@@ -155,6 +156,8 @@ export class FeedListing extends ElementBase {
   }
   
   onClickExpand() {
+    var expanded = this.elements.expandButton.getAttribute("aria-pressed") == "true";
+    this.elements.expandButton.setAttribute("aria-pressed", !expanded);
     this.elements.container.classList.toggle("expanded");
   }
 
@@ -185,9 +188,15 @@ export class FeedListing extends ElementBase {
     results.forEach(item => this.addItem(item));
   }
 
-  updatePlayed() {
+  updatePlayed(e) {
+    e.stopPropagation();
     this.elements.count.innerHTML = `${this.items.length} (0)`;
     Storage.set(`played-${this.getAttribute("src")}`, (new Date()).valueOf());
+    // add feed title and forward this up to the audio player
+    var { url, title } = e.detail;
+    this.dispatch("play-feed", {
+      url, title, feed: this.feedTitle
+    });
   }
   
   static get template() {
@@ -256,7 +265,7 @@ export class FeedListing extends ElementBase {
   text-decoration: none;
 }
 
-.expanded .expander {
+.expander[aria-pressed="true"] {
   transform: rotateX(180deg);
 }
 
@@ -311,10 +320,10 @@ export class FeedListing extends ElementBase {
 <div as="container">
   <div class="metadata">
     <div class="always-visible row">
-      <div class="title" as="title"></div>
+      <div class="title" as="title" tabindex="0"></div>
       <div class="spacer"></div>
       <div class="count" as="count"></div>
-      <button class="expander" as="expandButton">&#9661;</button>
+      <button class="expander" as="expandButton" aria-label="expanded" aria-pressed="false">&#9661;</button>
     </div>
     <div class="expanded-only row">
       <button class="unsubscribe button" as="unsubscribeButton">remove</button>
