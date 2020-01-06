@@ -74,6 +74,7 @@ class FeedCollection extends ElementBase {
 
 .sr-only {
   position: absolute;
+  top: 0;
   left: -1000px;
   opacity: 0;
   width: 1px;
