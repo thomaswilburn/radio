@@ -78,6 +78,8 @@ class FeedCollection extends ElementBase {
   opacity: 0;
   width: 1px;
   height: 1px;
+  clip: inset(0 0 0 0);
+  display: block;
 }
 </style>
 <h2 class="sr-only">Feeds</h2>
