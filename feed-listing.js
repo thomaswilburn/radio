@@ -193,10 +193,12 @@ export class FeedListing extends ElementBase {
     this.elements.count.innerHTML = `${this.items.length} (0)`;
     Storage.set(`played-${this.getAttribute("src")}`, (new Date()).valueOf());
     // add feed title and forward this up to the audio player
-    var { url, title } = e.detail;
-    this.dispatch("play-feed", {
-      url, title, feed: this.feedTitle
-    });
+    if (e.detail && e.detail.url) {
+      var { url, title } = e.detail;
+      this.dispatch("play-feed", {
+        url, title, feed: this.feedTitle
+      });
+    }
   }
   
   static get template() {
