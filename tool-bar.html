@@ -1,0 +1,39 @@
+<style>
+.top-bar {
+  margin: 0;
+  text-align: right;
+  padding: 4px;
+  background: #808;
+  color: white;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-family: var(--ui-font);
+  display: flex;
+  /*flex-direction: row-reverse;*/
+  justify-content: space-between;
+  align-items: center;
+}
+
+.top-bar h1 {
+  margin: 0;
+  padding: 0;
+  font-size: inherit;
+}
+
+.top-bar button {
+  border: 1px solid white;
+  background: transparent;
+  color: white;
+  padding: 4px;
+  font-size: inherit;
+}
+</style>
+<header class="top-bar">
+  <h1>Radio</h1>
+  <select class="tool-menu" as="tools">
+    <option value=".">Tools</option>
+    <option value="sync-export">Sync up</option>
+    <option value="sync-import">Sync down</option>
+  </select>
+  <button class="refresh-all" as="refreshAll">Refresh all</button>
+</header>

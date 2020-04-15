@@ -1,0 +1,29 @@
+<style>
+.add-feed {
+  border: none;
+  background: transparent;
+  display: block;
+  text-align: center;
+  padding: 8px 20px;
+  font-size: 20px;
+  text-transform: uppercase;
+  font-weight: bold;
+  cursor: pointer;
+  margin: auto;
+  font-family: var(--ui-font);
+}
+
+.sr-only {
+  position: absolute;
+  top: 0;
+  left: -1000px;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  clip: inset(0 0 0 0);
+  display: block;
+}
+</style>
+<h2 class="sr-only">Feeds</h2>
+<div class="feeds" as="feedContainer"></div>
+<button class="add-feed" as="addButton">add feed</button>

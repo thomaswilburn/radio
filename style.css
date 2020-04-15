@@ -18,15 +18,10 @@ body {
   touch-action: manipulation;
 }
 
-h1 {
-  margin: 0;
-  text-align: right;
-  padding: 4px;
-  background: #808;
-  color: white;
-  text-transform: uppercase;
-  font-size: 12px;
-  font-family: var(--ui-font);
+.sr-only {
+  position: absolute;
+  left: -1000px;
+  opacity: 0;
 }
 
 feed-collection {

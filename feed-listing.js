@@ -1,6 +1,6 @@
 import "./feed-item.js";
 import ElementBase from "./element-base.js";
-import Storage from "./storage.js";
+import app from "./app.js";
 
 var wait = function(delay) {
   return new Promise(ok => setTimeout(ok, delay));
@@ -9,7 +9,7 @@ var wait = function(delay) {
 var getXML = function(url) {
   return new Promise(function(ok, fail) {
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", window.location.search == "?useproxy" ? "/proxy?" + url : url);
+    xhr.open("GET", window.location.search == "?noproxy" ? url : "/proxy?" + url);
     xhr.responseType = "document";
     xhr.send();
     xhr.onload = () => ok(xhr.response);
@@ -30,10 +30,22 @@ export class FeedListing extends ElementBase {
     this.elements.expandButton.addEventListener("click", this.onClickExpand);
     this.elements.unsubscribeButton.addEventListener("click", this.onClickUnsubscribe);
     this.elements.loadMore.addEventListener("click", this.onClickMore);
+    this.elements.refreshButton.addEventListener("click", this.onClickRefresh);
+    this.elements.searchButton.addEventListener("click", this.onClickSearch);
+    this.elements.markReadButton.addEventListener("click", this.updatePlayed);
+    this.addEventListener("play-item", this.updatePlayed);
+    app.on("refresh-all", this.onClickRefresh);
   }
   
   static get boundMethods() {
-    return ["onClickExpand", "onClickUnsubscribe", "onClickMore"];
+    return [
+      "onClickExpand", 
+      "onClickUnsubscribe", 
+      "onClickMore", 
+      "onClickRefresh", 
+      "onClickSearch",
+      "updatePlayed"
+    ];
   }
   
   static get observedAttributes() {
@@ -51,10 +63,17 @@ export class FeedListing extends ElementBase {
   static get mirroredProps() {
     return ["src"];
   }
+
+  clearItems() {
+    this.cursor = 0;
+    this.elements.episodeContainer.querySelectorAll("feed-item").forEach(item => item.parentElement.removeChild(item)); 
+  }
   
   async update(url) {
     if (this.updating) return;
     this.elements.container.classList.add("updating");
+    this.clearItems();
+    this.items = [];
     this.updating = true;
     var spins = 0;
     var tick = () => {
@@ -70,7 +89,7 @@ export class FeedListing extends ElementBase {
       this.feedTitle = response.querySelector("channel title").textContent;
       this.elements.title.innerHTML = this.feedTitle;
       var unseen = 0;
-      var lastRequested = new Date((await Storage.get("requested-" + url)));
+      var lastPlayed = new Date((await app.read("played-" + url)));
       // parse item elements
       var items = this.items = Array.from(response.querySelectorAll("item")).map(item => {
         var text = {
@@ -88,7 +107,7 @@ export class FeedListing extends ElementBase {
         enclosure = enclosure.getAttribute("url");
         var date = new Date(text.pubDate ? Date.parse(text.pubDate) : 0);
         var value = { date, enclosure, ...text };
-        if (date <= lastRequested) {
+        if (date <= lastPlayed) {
           value.seen = true;
         } else {
           unseen++;
@@ -96,9 +115,9 @@ export class FeedListing extends ElementBase {
         return value;
       }).filter(d => d);
       this.addItems(10);
-      this.lastRequested = lastRequested;
+      this.lastPlayed = lastPlayed;
       this.elements.count.innerHTML = `${items.length} (${unseen})`;
-      await Storage.set("requested-" + url, (new Date()).valueOf());
+      await app.write("requested-" + url, (new Date()).valueOf());
     } catch (err) {
       console.log(err);
       this.elements.title.innerHTML = "Unable to pull feed";
@@ -111,9 +130,10 @@ export class FeedListing extends ElementBase {
   addItem(item) {
     var episode = document.createElement("feed-item");
     episode.setAttribute("title", item.title || "Untitled");
-    episode.setAttribute("description", item.description || "");
+    episode.setAttribute("feed-title", this.feedTitle);
+    episode.innerHTML = item.description;
     episode.setAttribute("url", item.enclosure);
-    episode.setAttribute("page", item.link);
+    if (item.link) episode.setAttribute("page", item.link);
     this.elements.episodeContainer.insertBefore(episode, this.elements.loadMore);
   }
 
@@ -137,110 +157,51 @@ export class FeedListing extends ElementBase {
   }
   
   onClickExpand() {
+    var expanded = this.elements.expandButton.getAttribute("aria-pressed") == "true";
+    this.elements.expandButton.setAttribute("aria-pressed", !expanded);
     this.elements.container.classList.toggle("expanded");
   }
 
   onClickMore() {
     this.addItems(10);
   }
-  
-  static get template() {
-    return `
-<style>
-:host {
-  display: block;
-  border-bottom: 1px solid #CCC;
-}
 
-.metadata {
-  display: flex;
-  align-items: center;
-  background: #333;
-  color: white;
-  font-family: var(--ui-font);
-}
+  onClickRefresh() {
+    var url = this.getAttribute("src");
+    this.update(url);
+  }
 
-.metadata button {
-  color: inherit;
-}
+  onClickSearch() {
+    if (!this.items) return;
+    var search = prompt("Query?");
+    if (!search) {
+      this.elements.container.classList.remove("searching");
+      this.elements.searchButton.innerHTML = "search";
+      this.clearItems();
+      this.addItems(10);
+      return;
+    }
+    this.elements.container.classList.add("searching");
+    this.elements.searchButton.innerHTML = "search: " + search;
+    var re = new RegExp(search, "gi");
+    var results = this.items.filter(item => item.title.match(re) || item.description.match(re));
+    this.clearItems();
+    results.forEach(item => this.addItem(item));
+  }
 
-.metadata .title {
- flex: 1;
- padding: 0 8px;
-}
-
-.metadata .count {
-  margin: 0 4px;
-}
-
-.expander {
-  border: none;
-  padding: 10px;
-  font-weight: bold;
-  background: transparent;
-  cursor: pointer;
-  transition: transform .2s ease;
-}
-
-.expanded .expander {
-  transform: rotate(180deg);
-}
-
-.expanded .episodes {
-  display: block;
-}
-
-.unsubscribe {
-  cursor: pointer;
-  text-decoration: underline;
-  border: none;
-  background: transparent;
-  text-align: right;
-}
-
-.updating .unsubscribe,
-.updating .expander {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.episodes {
-  padding: 0 0 0 4px;
-  margin: 0 0 0 4px;
-  display: none;
-  border-left: 4px dotted #333;
-}
-
-.load-more {
-  width: 100%;
-  display: block;
-  text-transform: uppercase;
-  padding: 24px 0;
-  text-align: center;
-  background: white;
-  cursor: pointer;
-  font-size: 18px;
-  border: none;
-  text-style: italic;
-  font-family: var(--ui-font);
-}
-</style>
-<div as="container">
-  <div class="metadata">
-    <div class="title">
-      <span as="title"></span>    
-      <button class="unsubscribe" as="unsubscribeButton">remove</button>
-    </div>
-    <div class="count" as="count"></div>
-    <button class="expander" as="expandButton">&#9661;</button>
-  </div>
-  <ul class="episodes" as="episodeContainer">
-    <button class="load-more" as="loadMore">Load more</button>
-  </ul>
-</div>
-`
+  updatePlayed(e) {
+    e.stopPropagation();
+    this.elements.count.innerHTML = `${this.items.length} (0)`;
+    app.write(`played-${this.getAttribute("src")}`, (new Date()).valueOf());
+    // add feed title and forward this up to the audio player
+    if (e.detail && e.detail.url) {
+      var { url, title } = e.detail;
+      app.fire("play-feed", {
+        url, title, feed: this.feedTitle
+      });
+    }
   }
   
 }
 
-window.customElements.define("feed-listing", FeedListing);
+FeedListing.define("feed-listing", "feed-listing.html");

@@ -1,4 +1,5 @@
 import ElementBase from "./element-base.js";
+import app from "./app.js";
 
 class AudioPlayer extends ElementBase {
   constructor() {
@@ -14,6 +15,7 @@ class AudioPlayer extends ElementBase {
     this.elements.scrubber.addEventListener("touchstart", this.onTouchScrubber);
     this.elements.scrubber.addEventListener("touchmove", this.onDragScrubber);
     this.elements.scrubber.addEventListener("touchend", this.onReleaseScrubber);
+    app.on("play-feed", this.onPlayItem);
     this.onAudio();
     this.setEnabledState(false);
   }
@@ -27,12 +29,13 @@ class AudioPlayer extends ElementBase {
       "onDragScrubber",
       "onReleaseScrubber",
       "onFFwd",
-      "onRewind"
+      "onRewind",
+      "onPlayItem"
     ];
   }
   
   static get observedAttributes() {
-    return ["src"]
+    return ["src", "title"]
   }
   
   attributeChangedCallback(attr, old, value) {
@@ -51,9 +54,25 @@ class AudioPlayer extends ElementBase {
     this.setEnabledState(!!value);
     this.audio.src = value;
   }
+
+  get title() {
+    return this.elements.title.innerHTML;
+  }
+
+  set title(value) {
+    this.elements.title.innerHTML = value.trim();
+  }
   
   disconnectedCallback() {
     this.audio.pause();
+  }
+  
+  onPlayItem(data) {
+    console.log(data);
+    var { title, url } = data;
+    this.title = title;
+    this.src = url;
+    this.play();
   }
 
   onFFwd() {
@@ -129,155 +148,26 @@ class AudioPlayer extends ElementBase {
       this.elements.playButton.setAttribute("state", "seeking");
     } else {
       this.setEnabledState(true);
+      this.elements.playButton.setAttribute("aria-pressed", !a.paused);
       this.elements.playButton.setAttribute("state", a.paused ? "paused" : "playing")
     }
     this.elements.timeDisplay.innerHTML = this.formatTime(a.currentTime);
     this.elements.totalDisplay.innerHTML = this.formatTime(a.duration);
+
+    app.fire("playing", { url: this.src });
     
     var ratio = a.currentTime / a.duration * 100;
     this.elements.progressBar.style.width = `${ratio | 0}%`;
   }
   
   play() {
+    this.elements.playButton.focus();
     return this.audio.play();
   }
   
   pause() {
     return this.audio.pause();
   }
-  
-  static get template() {
-    return `
-<style>
-:host {
-  display: flex;
-  align-items: center;
-  padding: 8px;
-  font-family: var(--ui-font);
 }
 
-button {
-  width: 40px;
-  height: 40px;
-  border-radius: 100%;
-  border: 3px solid #808;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: white;
-  color: #808;
-  line-height: 1;
-  margin-right: 10px;
-  padding: 0;
-}
-
-button[disabled] {
-  border-color: #CCC;
-  color: #CCC;
-}
-
-line, path {
-  stroke-width: 2;
-  stroke: currentColor;
-  fill: currentColor;
-}
-
-.play.button svg {
-  display: none;
-}
-
-.play.button[state="playing"] .pause-icon {
-  display: block;
-}
-
-.play.button[state="paused"] .play-icon {
-  display: block;
-}
-
-.play.button[state="seeking"] .seek-icon {
-  display: block;
-}
-
-.scrubber {
-  flex: 1;
-  position: relative;
-  align-items: center;
-  display: flex;
-  align-self: stretch;
-  margin: 0 10px;
-  cursor: pointer;
-}
-
-.scrubber .track {
-  flex: 1;
-  height: 10px;
-  background: #CCC;
-  pointer-events: none;
-}
-
-.progress {
-  position: absolute;
-  top: 50%;
-  height: 16px;
-  transform: translateY(-50%);
-  bottom: 0;
-  left: 0;
-  width: 0%;
-  background: #C8C;
-  pointer-events: none;
-}
-
-.scrubber.disabled {
-  cursor: default;
-}
-
-.scrubber.disabled .progress {
-  opacity: .1;
-}
-
-.progress::after {
-  position: absolute;
-  top: -2px;
-  right: -5px;
-  width: 10px;
-  height: calc(100% + 4px);
-  display: block;
-  content: "";
-  background: #808;
-}
-
-@media (min-width: 500px) {
-  .timecodes div { display: inline }
-  .timecodes .time[as="totalDisplay"]::before { content: "/ " }
-}
-
-</style>
-<button disabled as="playButton" class="play button" state="paused">
-  <svg class="play-icon" width=16 height=16>
-    <path d="M0,0 L16,8 0,16 Z" />
-  </svg>
-  <svg class="pause-icon" width=16 height=16>
-    <line x1=4 y1=0 x2=4 y2=16 />
-    <line x1=12 y1=0 x2=12 y2=16 />
-  </svg>
-  <svg class="seek-icon" width=16 height=16>
-    <circle cx=2 cy=8 r=2 />
-    <circle cx=8 cy=8 r=2 />
-    <circle cx=14 cy=8 r=2 />
-  </svg>
-</button>
-<button disabled as="rewind">-A</button>
-<button disabled as="ffwd">+A</button>
-<div class="scrubber disabled" as="scrubber">
-  <div class="track"></div>
-  <div class="progress" as="progressBar"></div>
-</div>
-<div class="timecodes">
-  <div class="time" as="timeDisplay"></div>
-  <div class="time" as="totalDisplay"></div>
-</div>
-`
-  }
-}
-
-window.customElements.define("audio-player", AudioPlayer);
+AudioPlayer.define("audio-player", "audio-player.html");

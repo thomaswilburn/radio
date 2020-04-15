@@ -1,6 +1,7 @@
 import { FeedListing } from "./feed-listing.js";
 import ElementBase from "./element-base.js";
 import storage from "./storage.js";
+import app from "./app.js";
 
 class FeedCollection extends ElementBase {
   constructor() {
@@ -13,7 +14,7 @@ class FeedCollection extends ElementBase {
   }
   
   async populate() {
-    this.feeds = (await storage.get("feeds")) || [
+    this.feeds = (await app.read("feeds")) || [
       "https://www.npr.org/rss/podcast.php?id=510312",
       "https://rss.acast.com/vicegamingsnewpodcast",
       "https://rss.simplecast.com/podcasts/2269/rss"
@@ -27,7 +28,7 @@ class FeedCollection extends ElementBase {
   
   async save() {
     this.feeds = this.feeds.filter(f => f);
-    return storage.set("feeds", this.feeds);
+    return app.write("feeds", this.feeds);
   }
   
   onRemovedFeed(e) {
@@ -49,28 +50,6 @@ class FeedCollection extends ElementBase {
   static get boundMethods() {
     return ["onClickAdd", "onRemovedFeed"]
   }
-  
-  static get template() {
-    return `
-<style>
-.add-feed {
-  border: none;
-  background: transparent;
-  display: block;
-  text-align: center;
-  padding: 8px 20px;
-  font-size: 20px;
-  text-transform: uppercase;
-  font-weight: bold;
-  cursor: pointer;
-  margin: auto;
-  font-family: var(--ui-font);
-}
-</style>
-<div class="feeds" as="feedContainer"></div>
-<button class="add-feed" as="addButton">add feed</button>
-`
-  }
 }
 
-window.customElements.define("feed-collection", FeedCollection);
+FeedCollection.define("feed-collection", "feed-collection.html");
