@@ -7,6 +7,7 @@ class AudioPlayer extends ElementBase {
     this.audio = document.createElement("audio");
     this.audio.addEventListener("timeupdate", this.onAudio);
     this.audio.addEventListener("seeking", this.onAudio);
+    ["stalled", "error", "abort"].forEach(e => this.audio.addEventListener(e, this.onAudioError));
     this.elements.playButton.addEventListener("click", this.onClickPlay);
     this.elements.ffwd.addEventListener("click", this.onFFwd);
     this.elements.rewind.addEventListener("click", this.onRewind);
@@ -25,6 +26,7 @@ class AudioPlayer extends ElementBase {
       "onClickPlay",
       "onClickScrubber",
       "onAudio",
+      "onAudioError",
       "onTouchScrubber",
       "onDragScrubber",
       "onReleaseScrubber",
@@ -69,8 +71,8 @@ class AudioPlayer extends ElementBase {
   
   onPlayItem(data) {
     console.log(data);
-    var { title, url } = data;
-    this.title = title;
+    var { title, url, feed } = data;
+    this.title = `${feed} - ${title}`;
     this.src = url;
     this.play();
   }
@@ -143,13 +145,13 @@ class AudioPlayer extends ElementBase {
   
   onAudio(e) {
     var a = this.audio;
-    if (e && e.type == "seeking") {
+    if (e && e.type == "seeking" && !a.paused) {
       this.setEnabledState(false);
       this.elements.playButton.setAttribute("state", "seeking");
     } else {
       this.setEnabledState(true);
       this.elements.playButton.setAttribute("aria-pressed", !a.paused);
-      this.elements.playButton.setAttribute("state", a.paused ? "paused" : "playing")
+      this.elements.playButton.setAttribute("state", a.paused ? "paused" : "playing");
     }
     this.elements.timeDisplay.innerHTML = this.formatTime(a.currentTime);
     this.elements.totalDisplay.innerHTML = this.formatTime(a.duration);
@@ -160,12 +162,19 @@ class AudioPlayer extends ElementBase {
     this.elements.progressBar.style.width = `${ratio | 0}%`;
   }
   
+  onAudioError(e) {
+    this.pause();
+    console.error(e);
+  }
+  
   play() {
     this.elements.playButton.focus();
     return this.audio.play();
   }
   
   pause() {
+    this.setEnabledState(true);
+    this.elements.playButton.setAttribute("state", "paused");
     return this.audio.pause();
   }
 }

@@ -84,7 +84,8 @@ export class FeedListing extends ElementBase {
     tick();
     var spinner = window.setInterval(tick, 200);
     try {
-      var response = this.feed = await getXML(url);
+      var [response, _ ] = await Promise.all([getXML(url), window.customElements.whenDefined("feed-item")]);
+      this.feed = response;
       this.elements.container.classList.remove("updating");
       this.feedTitle = response.querySelector("channel title").textContent;
       this.elements.title.innerHTML = this.feedTitle;

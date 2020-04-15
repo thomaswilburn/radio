@@ -19,6 +19,7 @@ class FeedCollection extends ElementBase {
       "https://rss.acast.com/vicegamingsnewpodcast",
       "https://rss.simplecast.com/podcasts/2269/rss"
     ];
+    await window.customElements.whenDefined("feed-listing");
     this.feeds.forEach(url => {
       var listing = document.createElement("feed-listing");
       listing.src = url;
