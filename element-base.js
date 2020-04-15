@@ -28,4 +28,17 @@ export default class ElementBase extends HTMLElement {
     });
     this.dispatchEvent(e);
   }
+  
+  static async define(tag, template) {
+    if (template) {
+      var response = await fetch(template);
+      var text = await response.text();
+      this.template = text;
+    }
+    try {
+      window.customElements.define(tag, this);
+    } catch (err) {
+      console.log(`Unable to (re)defined ${tag}: ${err.message}`);
+    }
+  }
 }
